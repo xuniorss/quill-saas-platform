@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils'
 import './globals.css'
 
 import { Navbar } from '@/components/Navbar'
+import { Providers } from '@/components/Providers'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { ReactNode } from 'react'
@@ -17,15 +18,17 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
 	return (
 		<html lang="pt-BR" className="light">
-			<body
-				className={cn(
-					'grainy min-h-screen font-sans antialiased',
-					inter.className,
-				)}
-			>
-				<Navbar />
-				{children}
-			</body>
+			<Providers>
+				<body
+					className={cn(
+						'grainy min-h-screen font-sans antialiased',
+						inter.className,
+					)}
+				>
+					<Navbar />
+					{children}
+				</body>
+			</Providers>
 		</html>
 	)
 }
