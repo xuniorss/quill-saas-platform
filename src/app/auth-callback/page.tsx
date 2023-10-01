@@ -13,5 +13,12 @@ export default function AuthCallbackPage() {
 		onSuccess: ({ success }) => {
 			if (success) router.push(origin ? `/${origin}` : '/dashboard')
 		},
+		onError: (err) => {
+			if (err.data?.code === 'UNAUTHORIZED') {
+				router.push('/sign-in')
+			}
+		},
+		retry: true,
+		retryDelay: 500,
 	})
 }
