@@ -2,6 +2,7 @@ import { cn } from '@/lib/utils'
 
 import './globals.css'
 
+import { Navbar } from '@/components/Navbar'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { ReactNode } from 'react'
@@ -22,6 +23,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 					inter.className,
 				)}
 			>
+				<Navbar />
 				{children}
 			</body>
 		</html>
