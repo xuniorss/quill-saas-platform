@@ -23,14 +23,14 @@ export default async function FileIdPage({ params }: PageProps) {
 
 	return (
 		<section className="flex h-[calc(100vh-3.5rem)] flex-1 flex-col justify-between">
-			<div className="max-w-8xl mx-auto w-full grow lg:flex xl:px-2">
+			<div className="mx-auto w-full max-w-8xl grow lg:flex xl:px-2">
 				<div className="flex-1 xl:flex">
 					<div className="px-4 py-6 sm:px-6 lg:pl-8 xl:flex-1 xl:pl-6">
 						<PdfRenderer url={file.url} />
 					</div>
 				</div>
 				<div className="flex-[0.75] shrink-0 border-t border-gray-200 lg:w-96 lg:border-l lg:border-t-0">
-					<ChatWrapper isSubscribed={plan.isSubscribed} fileId={file.id} />
+					<ChatWrapper isSubscribed={false} fileId={file.id} />
 				</div>
 			</div>
 		</section>

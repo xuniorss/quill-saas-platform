@@ -1,18 +1,33 @@
 'use client'
 
+import { trpc } from '@/app/_trpc/client'
 import { useUploadThing } from '@/lib/uploadthing'
-import { Cloud, File } from 'lucide-react'
+import { Cloud, File, Loader2 } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import Dropzone from 'react-dropzone'
 import { Button } from '../ui/button'
 import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog'
 import { Progress } from '../ui/progress'
+import { useToast } from '../ui/use-toast'
 
 const UploadDropzone = () => {
 	const [isUploading, setIsUploading] = useState(false)
 	const [uploadProgress, setUploadProgress] = useState(0)
 
+	const router = useRouter()
+
+	const { toast } = useToast()
+
 	const { startUpload } = useUploadThing('pdfUploader')
+
+	const { mutate: startPolling } = trpc.getFile.useMutation({
+		onSuccess: (file) => {
+			router.push(`/dashboard/${file.id}`)
+		},
+		retry: true,
+		retryDelay: 500,
+	})
 
 	const startSimulatedProgress = () => {
 		setUploadProgress(0)
@@ -39,8 +54,27 @@ const UploadDropzone = () => {
 
 				const res = await startUpload(acceptedFile)
 
+				if (!res)
+					return toast({
+						title: 'Algo deu errado.',
+						description: 'Por favor, tente novamente mais tarde.',
+						variant: 'destructive',
+					})
+
+				const [fileResponse] = res
+				const key = fileResponse?.key
+
+				if (!key)
+					return toast({
+						title: 'Algo deu errado.',
+						description: 'Por favor, tente novamente mais tarde.',
+						variant: 'destructive',
+					})
+
 				clearInterval(progressInterval)
 				setUploadProgress(100)
+
+				startPolling({ key })
 			}}
 		>
 			{({ getRootProps, getInputProps, acceptedFiles }) => (
@@ -77,11 +111,27 @@ const UploadDropzone = () => {
 							{isUploading ? (
 								<div className="mx-auto mt-4 w-full max-w-xs">
 									<Progress
+										indicatorColor={
+											uploadProgress === 100 ? 'bg-green-500' : ''
+										}
 										value={uploadProgress}
 										className="h-1 w-full bg-zinc-200"
 									/>
+									{uploadProgress === 100 ? (
+										<span className="flex items-center justify-center gap-1 pt-2 text-center text-sm text-zinc-700">
+											<Loader2 className="h-3 w-3 animate-spin" />
+											Redirecionando...
+										</span>
+									) : null}
 								</div>
 							) : null}
+
+							<input
+								{...getInputProps()}
+								type="file"
+								id="dropzone-file"
+								className="hidden"
+							/>
 						</label>
 					</div>
 				</div>
