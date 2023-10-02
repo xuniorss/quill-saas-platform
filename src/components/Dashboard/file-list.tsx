@@ -1,3 +1,5 @@
+'use client'
+
 import { trpc } from '@/app/_trpc/client'
 import { UploadStatus } from '@prisma/client'
 import { format } from 'date-fns'
@@ -23,6 +25,18 @@ export const FileList = memo(({ file }: { file: FileListProps }) => {
 	>(null)
 
 	const utils = trpc.useContext()
+
+	const { mutate: deleteFile } = trpc.deleteFile.useMutation({
+		onSuccess: () => {
+			utils.getUserFiles.invalidate()
+		},
+		onMutate: ({ id }) => {
+			setCurrentlyDeletingFile(id)
+		},
+		onSettled() {
+			setCurrentlyDeletingFile(null)
+		},
+	})
 
 	return (
 		<li className="col-span-1 divide-y divide-gray-200 rounded-lg bg-white shadow transition hover:shadow-lg">
@@ -50,7 +64,7 @@ export const FileList = memo(({ file }: { file: FileListProps }) => {
 				</div>
 
 				<Button
-					// onClick={() => deleteFile({ id: file.id })}
+					onClick={() => deleteFile({ id: file.id })}
 					size="sm"
 					className="w-full"
 					variant="destructive"
